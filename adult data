@@ -1,0 +1,37 @@
+#import libraries
+import pandas as pd
+import numpy as np
+% matplotlib inline
+from matplotlib import pyplot as plt
+import seaborn as sns
+#giving headers to column
+columns= ['age','workclass','fnlwgt','education','education-num','marital-status',
+                    'occupation','relationship','race','sex','capital-gain','capital-loss',
+                    'hours-per-week','native-country','income']
+
+#loading dataset
+adult= pd.read_csv(r'https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data',sep=",",names=columns, header= None)
+#to consider cat data as type category
+for col in set(adult.columns) - set(adult.describe().columns):
+    adult[col] = adult[col].astype('category')
+adult.info()
+#display last few rows
+#adult.tail()
+#display first few rows 
+adult.head(30)
+#since this column is not much usefull for analysis
+adult=adult.drop('fnlwgt', axis=1)
+#adult
+#making target variable simple in terms of 0 and 1
+adult['income'] =[0 if x==' <=50K' else 1 for x in adult['income']]
+adult.shape #shape after converting target as 0 and 1
+# Remove invalid data from table
+adult= adult[(adult.astype(str) != ' ?').all(axis=1)]
+adult.shape #shape after removal of ?
+#Separate categorical and numberical columns
+cat= adult.dtypes[adult.dtypes == 'object']
+num= adult.dtypes[adult.dtypes != 'object']
+sns.heatmap(adult[list(adult.dtypes.index)].corr(),annot = True,square = True);
+# Use one-hot encoding on categorial columns
+adult = pd.get_dummies(adult, columns=['workclass', 'education', 'marital-status', 'occupation', 'relationship', 'race', 'sex','native-country'],drop_first=True)
+#adult
